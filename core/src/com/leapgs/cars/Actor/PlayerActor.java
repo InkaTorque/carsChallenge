@@ -3,6 +3,7 @@ package com.leapgs.cars.Actor;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.leapgs.cars.Screens.GameplayScreen;
 
@@ -12,6 +13,7 @@ import com.leapgs.cars.Screens.GameplayScreen;
 
 public class PlayerActor extends Actor {
 
+    public Rectangle bounds;
     GameplayScreen screen;
     Texture playerTexture;
 
@@ -20,6 +22,7 @@ public class PlayerActor extends Actor {
         playerTexture = new Texture("sprites/lightning.png");
         setSize(playerTexture.getWidth()*5,playerTexture.getHeight()*5);
         setPosition(x,y);
+        bounds=new Rectangle((int)getX(), (int)getY(), (int)getWidth(), (int)getHeight());
     }
 
     @Override
@@ -30,5 +33,6 @@ public class PlayerActor extends Actor {
     @Override
     public void act(float delta) {
         super.act(delta);
+        bounds.set(getX(),getY(),getWidth(),getHeight());
     }
 }

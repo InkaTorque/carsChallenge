@@ -26,7 +26,7 @@ public class MainGame extends Game {
 	public Preferences scorePrefs;
 
 
-	public boolean testing = false;
+	public boolean testing = true;
 
 	@Override
 	public void create() {

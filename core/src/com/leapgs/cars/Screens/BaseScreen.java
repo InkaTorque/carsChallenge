@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -25,6 +26,7 @@ public class BaseScreen implements Screen {
     Stage stage;
 
     ScreenOverlayActor overlayActor;
+    Group overlayGroup,gameplayGroup,parentGroup;
 
     public BaseScreen(MainGame mainGame)
     {
@@ -34,8 +36,7 @@ public class BaseScreen implements Screen {
         camera=new OrthographicCamera();
         camera.setToOrtho(false, game.window.width, game.window.height);
 
-        if(game.testing) viewport=new FitViewport(game.window.width*1.65f, game.window.height*1.65f, camera);
-        else viewport=new FitViewport(game.window.width, game.window.height, camera); //Keep Screen Size
+        viewport=new FitViewport(game.window.width, game.window.height, camera); //Keep Screen Size
 
     }
 
@@ -43,7 +44,16 @@ public class BaseScreen implements Screen {
     public void show() {
         stage = new Stage(viewport);
         overlayActor = new ScreenOverlayActor(game);
-        stage.addActor(overlayActor);
+        overlayGroup = new Group();
+        overlayGroup.addActor(overlayActor);
+
+        gameplayGroup = new Group();
+
+        parentGroup = new Group();
+        parentGroup.addActorAt(0,gameplayGroup);
+        parentGroup.addActorAt(1,overlayGroup);
+
+        stage.addActor(parentGroup);
     }
 
 

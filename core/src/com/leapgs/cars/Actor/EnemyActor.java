@@ -2,6 +2,7 @@ package com.leapgs.cars.Actor;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.leapgs.cars.Constants.Constants;
 import com.leapgs.cars.Screens.GameplayScreen;
@@ -12,16 +13,22 @@ import com.leapgs.cars.Screens.GameplayScreen;
 
 public class EnemyActor extends Actor{
 
+    public Rectangle bounds;
     Texture enemyText;
     float movementSpeed;
     GameplayScreen screen;
+    PlayerActor player;
+    boolean alreadyCollided;
 
-    public EnemyActor(GameplayScreen screen, float x , float y, int level) {
+    public EnemyActor(GameplayScreen screen, float x , float y, int level,PlayerActor player) {
         enemyText = new Texture("sprites/enemy.png");
         setSize(enemyText.getWidth()*5,enemyText.getHeight()*5);
         this.screen = screen;
         setPosition(x,y);
+        this.player = player;
         assignMovementSpeed(level);
+        alreadyCollided = false;
+        bounds=new Rectangle((int)getX(), (int)getY(), (int)getWidth(), (int)getHeight());
     }
 
     private void assignMovementSpeed(int level) {
@@ -37,12 +44,41 @@ public class EnemyActor extends Actor{
 
     @Override
     public void act(float delta) {
-        setPosition(getX(),getY()-delta*movementSpeed);
-        if(getY()+getHeight()<-450)
+        bounds.set(getX(),getY(),getWidth(),getHeight());
+        if(checkCollision())
         {
-            remove();
+            setPosition(getX(),getY()+delta*movementSpeed);
+            if(getY()+getHeight()>450)
+            {
+                remove();
+            }
+        }
+        else
+        {
+            setPosition(getX(),getY()-delta*movementSpeed);
+            if(getY()+getHeight()<-25)
+            {
+                remove();
+                screen.addPassedCarsCounter();
+            }
         }
 
+
+    }
+
+    private boolean checkCollision() {
+
+        if(alreadyCollided)
+            return true;
+        if(bounds.overlaps(player.bounds))
+        {
+            alreadyCollided=true;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     @Override

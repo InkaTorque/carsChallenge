@@ -1,29 +1,25 @@
 package com.leapgs.cars.InputProcessor;
 
 import com.badlogic.gdx.input.GestureDetector;
+import com.leapgs.cars.Screens.GameplayScreen;
 import com.leapgs.cars.Screens.WelcomeScreen;
 
 /**
- * Created by Leap-Pancho on 6/21/2017.
+ * Created by Leap-Pancho on 6/22/2017.
  */
 
-public class WelcomeScreenInputProcessor extends GestureDetector.GestureAdapter {
+public class GameplayInputProcessor extends GestureDetector.GestureAdapter {
 
-    WelcomeScreen screen;
+    GameplayScreen screen;
 
-    public WelcomeScreenInputProcessor(WelcomeScreen screen)
+    public GameplayInputProcessor(GameplayScreen screen)
     {
         this.screen=screen;
     }
 
     @Override
-    public boolean fling(float velocityX, float velocityY, int button) {
-        return true;
-    }
-
-    @Override
     public boolean tap(float x, float y, int count, int button) {
-        screen.game.goToDifficultyScreen();
+        screen.changePlayerLane();
         return true;
     }
 
