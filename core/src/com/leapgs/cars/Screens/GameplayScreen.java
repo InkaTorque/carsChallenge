@@ -1,11 +1,13 @@
 package com.leapgs.cars.Screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Json;
 import com.leapgs.cars.Actor.EnemyActor;
 import com.leapgs.cars.Actor.PlayerActor;
 import com.leapgs.cars.Actor.RoadActor;
@@ -13,6 +15,7 @@ import com.leapgs.cars.Constants.Constants;
 import com.leapgs.cars.InputProcessor.GameplayInputProcessor;
 import com.leapgs.cars.MainGame;
 import com.leapgs.cars.Model.LevelData;
+import com.sun.org.apache.xpath.internal.SourceTree;
 
 import java.util.Random;
 
@@ -54,24 +57,13 @@ public class GameplayScreen extends BaseScreen {
         carsGroup = new Group();
         backgroundGroup = new Group();
 
-        setUpLevelData(currentLevel);
-
         currentSameLaneProbability = Constants.LEVEL_1_SAME_LANE_PROBABILITY;
 
         gameplayInputProcessor = new GameplayInputProcessor(this);
 
         ran = new Random();
-    }
 
-    private void setUpLevelData(int currentLevel) {
-        switch (currentLevel)
-        {
-            case 1: currentLevelData = new LevelData(60,2.5F,10);
-            case 2: currentLevelData = new LevelData(60,2.5F,10);
-            case 3: currentLevelData = new LevelData(60,2.5F,10);
-            case 4: currentLevelData = new LevelData(60,2.5F,10);
-            case 5: currentLevelData = new LevelData(60,2.5F,10);
-        }
+        setUpCurrentLevel(currentLevel);
     }
 
     @Override
@@ -93,8 +85,7 @@ public class GameplayScreen extends BaseScreen {
         gameplayGroup.addActorAt(0,backgroundGroup);
         gameplayGroup.addActorAt(1,carsGroup);
 
-        //stage.setDebugAll(game.testing);
-        setUpCurrentLevel();
+        stage.setDebugAll(game.testing);
 
     }
 
@@ -106,17 +97,25 @@ public class GameplayScreen extends BaseScreen {
         overlayGroup.addActor(label);
     }
 
-    private void setUpCurrentLevel() {
-        currentPassedCars=0;
-        currentSlotNumbers = currentLevelData.enemyNumber+2;
-        currentSpawnStep = currentLevelData.timeStep;
-        currentSpawnWaitTime = currentLevelData.spawnWaitTime;
-        lapTime = currentLevelData.totalLapTime;
-        carsInCompetition = currentLevelData.enemyNumber+1;
+    private void setUpCurrentLevel(int currentLevel) {
+
+        FileHandle file = Gdx.files.local("levels/level"+currentLevel+".json");
+        String levelString = file.readString();
+        Json json = new Json();
+
+        currentLevelData = json.fromJson(LevelData.class,levelString);
+        currentLevelData.calculateLapParameters();
+
+        currentSlotNumbers = currentLevelData.getEnemyNumber()+2;
+        currentSpawnStep = currentLevelData.getTimeStep();
+        currentSpawnWaitTime = currentLevelData.getSpawnWaitTime();
+        lapTime = currentLevelData.getTotalLapTime();
+        carsInCompetition = currentLevelData.getEnemyNumber()+1;
         waitedTime = false;
         carsLeft = true;
         spawnTimer=0;
         lapTimer = lapTime;
+        currentPassedCars=0;
     }
 
 
@@ -135,6 +134,7 @@ public class GameplayScreen extends BaseScreen {
         {
             if(!waitedTime)
             {
+                System.out.println("WAITING TO FIRST SPAWN");
                 spawnTimer = spawnTimer+delta;
                 if(spawnTimer >= currentSpawnWaitTime)
                 {
@@ -144,9 +144,11 @@ public class GameplayScreen extends BaseScreen {
             }
             else
             {
+                System.out.println("SPAWNING TIMER ACTIVATED");
                 spawnTimer = spawnTimer+delta;
                 if(spawnTimer>=currentSpawnStep)
                 {
+                    System.out.println("time to spawn");
                     spawnTimer=0f;
                     spawnNewEnemy();
                     spawnedCounter++;

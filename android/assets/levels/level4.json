@@ -1,0 +1,5 @@
+{
+  time: 60
+  spawnWaitTime: 2.5
+  enemyNumber: 10
+}
